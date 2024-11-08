@@ -7,6 +7,9 @@ import com.appsdeveloperblog.app.ws.shared.Utils;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +21,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     Utils utils;
 
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     public UserDto createUser(UserDto userDto) {
         // Check if user is already in database
@@ -26,11 +32,9 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = new UserEntity();
         BeanUtils.copyProperties(userDto, userEntity);
 
-        // hardcoded for now
         String publicUserId = utils.generateUserId(30);
         userEntity.setUserId(publicUserId);
-        userEntity.setEncryptedPassword("test");
-        // ---------------------------------------
+        userEntity.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
 
@@ -38,5 +42,10 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(storedUserDetails, storedUserDto);
 
         return storedUserDto;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
     }
 }
