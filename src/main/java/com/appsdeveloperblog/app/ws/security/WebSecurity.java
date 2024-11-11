@@ -42,7 +42,7 @@ public class WebSecurity {
         http
                 .csrf(
                         AbstractHttpConfigurer::disable).authorizeHttpRequests((authz) -> authz
-                        .requestMatchers(HttpMethod.POST, "/users")
+                        .requestMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
                         .permitAll()
                         .anyRequest().authenticated());
 
