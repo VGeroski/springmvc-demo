@@ -5,6 +5,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.appsdeveloperblog.app.ws.io.repository.UserRepository;
@@ -39,8 +40,8 @@ public class WebSecurity {
 
         // allow post method on users, because user can not be authenticated before creating account
         http
-                .csrf((csrf) -> csrf.disable())
-                .authorizeHttpRequests((authz) -> authz
+                .csrf(
+                        AbstractHttpConfigurer::disable).authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.POST, "/users")
                         .permitAll()
                         .anyRequest().authenticated());
