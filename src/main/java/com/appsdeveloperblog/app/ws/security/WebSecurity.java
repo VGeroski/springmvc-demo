@@ -2,6 +2,7 @@ package com.appsdeveloperblog.app.ws.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,13 +39,17 @@ public class WebSecurity {
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder);
 
+        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+
         // allow post method on users, because user can not be authenticated before creating account
         http
                 .csrf(
                         AbstractHttpConfigurer::disable).authorizeHttpRequests((authz) -> authz
                         .requestMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL)
                         .permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated())
+                        .authenticationManager(authenticationManager)
+                        .addFilter(new AuthenticationFilter(authenticationManager));
 
         return http.build();
     }
