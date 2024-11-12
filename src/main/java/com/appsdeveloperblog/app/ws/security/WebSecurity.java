@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.appsdeveloperblog.app.ws.io.repository.UserRepository;
@@ -41,6 +42,10 @@ public class WebSecurity {
 
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
+        // Customize Login URL path
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter(authenticationManager);
+        authenticationFilter.setFilterProcessesUrl("/users/login");
+
         // allow post method on users, because user can not be authenticated before creating account
         http
                 .csrf(
@@ -49,7 +54,10 @@ public class WebSecurity {
                         .permitAll()
                         .anyRequest().authenticated())
                         .authenticationManager(authenticationManager)
-                        .addFilter(new AuthenticationFilter(authenticationManager));
+                        .addFilter(authenticationFilter)
+                        .addFilter(new AuthorizationFilter(authenticationManager))
+                        .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return http.build();
     }
