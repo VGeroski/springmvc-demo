@@ -32,7 +32,10 @@ public class UserController {
      * @param userDetails request model as body
      * @return UserRest object so caller knows about status od creation
      */
-    @PostMapping
+    @PostMapping(
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+    )
     public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
         UserRest user = new UserRest();
 
