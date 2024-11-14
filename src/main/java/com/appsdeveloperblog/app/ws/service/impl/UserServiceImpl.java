@@ -86,6 +86,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void deleteUser(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+        if(userEntity == null) throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+
+        userRepository.delete(userEntity);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(username); // our username is actually email
         if(userEntity == null) throw new UsernameNotFoundException(username);

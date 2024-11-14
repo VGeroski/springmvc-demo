@@ -4,6 +4,8 @@ import com.appsdeveloperblog.app.ws.exceptions.UserServiceException;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.ui.model.reponse.ErrorMessages;
+import com.appsdeveloperblog.app.ws.ui.model.reponse.OperationStatusModel;
+import com.appsdeveloperblog.app.ws.ui.model.reponse.RequestOperationStatus;
 import com.appsdeveloperblog.app.ws.ui.model.reponse.UserRest;
 import com.appsdeveloperblog.app.ws.ui.model.request.UserDetailsRequestModel;
 import org.springframework.beans.BeanUtils;
@@ -38,7 +40,7 @@ public class UserController {
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
+    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) {
         UserRest user = new UserRest();
 
         if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
@@ -58,7 +60,7 @@ public class UserController {
             consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
     )
-    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) throws Exception {
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails) {
         UserRest user = new UserRest();
 
         UserDto userDto = new UserDto();
@@ -70,8 +72,14 @@ public class UserController {
         return user;
     }
 
-    @DeleteMapping
-    public String deleteUser() {
-        return "delete user was called";
+    @DeleteMapping(path = "/{id}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public OperationStatusModel deleteUser(@PathVariable String id) {
+        OperationStatusModel operationStatusModel = new OperationStatusModel();
+        operationStatusModel.setOperationName(RequestOperationName.DELETE.name());
+        operationStatusModel.setOperationResult(RequestOperationStatus.SUCCESS.name());
+
+        userService.deleteUser(id);
+
+        return operationStatusModel;
     }
 }
