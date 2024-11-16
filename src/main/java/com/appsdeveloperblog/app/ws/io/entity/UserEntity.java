@@ -1,12 +1,10 @@
 package com.appsdeveloperblog.app.ws.io.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity(name = "users")
 public class UserEntity implements Serializable {
@@ -36,6 +34,8 @@ public class UserEntity implements Serializable {
 
     @Column(nullable = false)
     private Boolean emailVerificationStatus = Boolean.FALSE;
+
+    //List<Addresses> addresses;
 
     public Long getId() {
         return id;

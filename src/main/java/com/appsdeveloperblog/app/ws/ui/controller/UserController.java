@@ -8,6 +8,7 @@ import com.appsdeveloperblog.app.ws.ui.model.reponse.OperationStatusModel;
 import com.appsdeveloperblog.app.ws.ui.model.reponse.RequestOperationStatus;
 import com.appsdeveloperblog.app.ws.ui.model.reponse.UserRest;
 import com.appsdeveloperblog.app.ws.ui.model.request.UserDetailsRequestModel;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -48,8 +49,9 @@ public class UserController {
 
         if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDetails, userDto);
+        // We need deep copy - Model Mapper does that
+        ModelMapper modelMapper = new ModelMapper();
+        UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
         UserDto createdUser = userService.createUser(userDto);
         // populate value that will be returned
