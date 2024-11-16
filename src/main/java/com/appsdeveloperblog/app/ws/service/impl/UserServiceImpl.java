@@ -5,8 +5,10 @@ import com.appsdeveloperblog.app.ws.io.repository.UserRepository;
 import com.appsdeveloperblog.app.ws.io.entity.UserEntity;
 import com.appsdeveloperblog.app.ws.service.UserService;
 import com.appsdeveloperblog.app.ws.shared.Utils;
+import com.appsdeveloperblog.app.ws.shared.dto.AddressDto;
 import com.appsdeveloperblog.app.ws.shared.dto.UserDto;
 import com.appsdeveloperblog.app.ws.ui.model.reponse.ErrorMessages;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,8 +40,15 @@ public class UserServiceImpl implements UserService {
         // Check if user is already in database
         if (userRepository.findByEmail(userDto.getEmail()) != null) throw new RuntimeException("User already exists");
 
-        UserEntity userEntity = new UserEntity();
-        BeanUtils.copyProperties(userDto, userEntity);
+        for (int i = 0; i < userDto.getAddresses().size(); i++) {
+            AddressDto addressDto = userDto.getAddresses().get(i);
+            addressDto.setUserDetails(userDto);
+            addressDto.setAddressId(utils.generateAddressId(30));
+            userDto.getAddresses().set(i, addressDto);
+        }
+
+        ModelMapper modelMapper = new ModelMapper();
+        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
 
         String publicUserId = utils.generateUserId(30);
         userEntity.setUserId(publicUserId);
@@ -47,10 +56,7 @@ public class UserServiceImpl implements UserService {
 
         UserEntity storedUserDetails = userRepository.save(userEntity);
 
-        UserDto storedUserDto = new UserDto();
-        BeanUtils.copyProperties(storedUserDetails, storedUserDto);
-
-        return storedUserDto;
+        return modelMapper.map(storedUserDetails, UserDto.class);
     }
 
     @Override
